@@ -1,6 +1,6 @@
 import os
 
-from hilo import PID, PIDDevice, ActuatorPlant, CampaignRunner
+from xiloop import PID, PIDDevice, ActuatorPlant, CampaignRunner
 
 PLAN = os.path.join(os.path.dirname(__file__), "..", "examples", "actuator_pid", "testplan.yaml")
 
@@ -21,4 +21,4 @@ def test_report_is_written(tmp_path):
     out = tmp_path / "report.md"
     result.to_markdown(str(out))
     text = out.read_text(encoding="utf-8")
-    assert "HiLo Test Report" in text and "REQ-1" in text
+    assert "XiLoop Test Report" in text and "REQ-1" in text

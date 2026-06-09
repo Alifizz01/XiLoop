@@ -1,4 +1,4 @@
-from hilo import PID, PIDDevice, ActuatorPlant, LoopEngine
+from xiloop import PID, PIDDevice, ActuatorPlant, LoopEngine
 
 
 def test_loop_produces_expected_sample_count():

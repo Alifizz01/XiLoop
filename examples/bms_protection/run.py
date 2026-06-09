@@ -3,16 +3,16 @@
 Scenario: a battery protection device must open the contactor within 50 ms
 of the current exceeding 50 A. This is not a step-response metric, so instead
 of the CampaignRunner we use the LoopEngine as a library and write our own
-check — the "pytest for control loops" style.
+check - the "pytest for control loops" style.
 
 Run from the repo root:  python -m examples.bms_protection.run
 """
 from dataclasses import dataclass
 
-from hilo import Device, Plant, LoopEngine
+from xiloop import Device, Plant, LoopEngine
 
-I_LIMIT = 50.0      # A — protection threshold
-T_MAX = 0.050       # s — must shut down within 50 ms
+I_LIMIT = 50.0      # A - protection threshold
+T_MAX = 0.050       # s - must shut down within 50 ms
 
 
 @dataclass
@@ -36,7 +36,7 @@ class FaultyLoadPlant(Plant):
 
 class ProtectionDevice(Device):
     """The logic under test: open the contactor when current exceeds the limit
-    (latched — stays open). This is the 'firmware' we want to verify."""
+    (latched - stays open). This is the 'firmware' we want to verify."""
 
     def __init__(self, limit: float = I_LIMIT):
         self.limit = limit

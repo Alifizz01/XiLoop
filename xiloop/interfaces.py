@@ -1,8 +1,8 @@
-"""The two plug-in points of HiLo.
+"""The two plug-in points of XiLoop.
 
 Anything that implements `Device` can be tested; anything that implements
 `Plant` can be controlled. The LoopEngine only ever talks to these two
-interfaces — which is what lets the same test campaign run against a Python
+interfaces - which is what lets the same test campaign run against a Python
 prototype today and emulated/real firmware later.
 """
 from abc import ABC, abstractmethod

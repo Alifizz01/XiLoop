@@ -2,12 +2,12 @@
 users add their own by implementing Plant.step()."""
 from dataclasses import dataclass
 
-from hilo.interfaces import Plant
+from xiloop.interfaces import Plant
 
 
 @dataclass
 class ActuatorPlant(Plant):
-    """J*theta'' + b*theta' = Kt*u  — a rotary actuator with inertia & damping."""
+    """J*theta'' + b*theta' = Kt*u - a rotary actuator with inertia & damping."""
     J: float = 0.01     # inertia
     b: float = 0.10     # viscous damping
     Kt: float = 1.0     # gain

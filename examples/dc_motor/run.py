@@ -4,7 +4,7 @@ Run from the repo root:  python -m examples.dc_motor.run
 """
 import os
 
-from hilo import PID, PIDDevice, CampaignRunner
+from xiloop import PID, PIDDevice, CampaignRunner
 from examples.dc_motor.plant import DCMotorPlant
 
 HERE = os.path.dirname(__file__)

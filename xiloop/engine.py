@@ -1,13 +1,13 @@
-"""LoopEngine — the heartbeat of HiLo.
+"""LoopEngine - the heartbeat of XiLoop.
 
 Runs the device<->plant exchange at a fixed step. Two timing modes:
-  * fast (default): as fast as the CPU allows — ideal for CI and batch testing.
-  * realtime: each tick is synchronized to the wall clock — feels like a bench.
+  * fast (default): as fast as the CPU allows - ideal for CI and batch testing.
+  * realtime: each tick is synchronized to the wall clock - feels like a bench.
 """
 import time
 from dataclasses import dataclass, field
 
-from hilo.interfaces import Device, Plant
+from xiloop.interfaces import Device, Plant
 
 
 @dataclass

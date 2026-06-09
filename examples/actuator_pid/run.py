@@ -1,11 +1,11 @@
-"""HiLo example: verify a PID position controller against an actuator model.
+"""XiLoop example: verify a PID position controller against an actuator model.
 
 Run from the repo root:
     python -m examples.actuator_pid.run
 """
 import os
 
-from hilo import PID, PIDDevice, ActuatorPlant, CampaignRunner, LoopEngine
+from xiloop import PID, PIDDevice, ActuatorPlant, CampaignRunner, LoopEngine
 
 HERE = os.path.dirname(__file__)
 

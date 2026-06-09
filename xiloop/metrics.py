@@ -1,5 +1,5 @@
-"""Step-response metrics — the quantities requirements are written against."""
-from hilo.engine import LoopResult
+"""Step-response metrics - the quantities requirements are written against."""
+from xiloop.engine import LoopResult
 
 
 def step_metrics(result: LoopResult) -> dict:

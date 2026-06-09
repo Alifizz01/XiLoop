@@ -3,7 +3,7 @@ Device interface so the LoopEngine can run it. Users wrap their own logic the
 same way."""
 from dataclasses import dataclass
 
-from hilo.interfaces import Device
+from xiloop.interfaces import Device
 
 
 @dataclass
@@ -32,7 +32,7 @@ class PID:
 
 
 class PIDDevice(Device):
-    """Adapts a PID controller to HiLo's Device interface."""
+    """Adapts a PID controller to XiLoop's Device interface."""
 
     def __init__(self, pid: PID | None = None):
         self.pid = pid or PID()

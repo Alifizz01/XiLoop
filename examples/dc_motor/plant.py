@@ -7,7 +7,7 @@ Physics (simplified, standard first-order motor model):
 """
 from dataclasses import dataclass
 
-from hilo import Plant
+from xiloop import Plant
 
 
 @dataclass

@@ -1,4 +1,4 @@
-"""CampaignRunner — the heart of HiLo.
+"""CampaignRunner - the heart of XiLoop.
 
 Reads a YAML test plan (scenarios + requirements), runs every scenario through
 the LoopEngine, checks every requirement against the measured metrics, and
@@ -22,9 +22,9 @@ from dataclasses import dataclass, field
 
 import yaml
 
-from hilo.engine import LoopEngine
-from hilo.interfaces import Device, Plant
-from hilo.metrics import step_metrics
+from xiloop.engine import LoopEngine
+from xiloop.interfaces import Device, Plant
+from xiloop.metrics import step_metrics
 
 
 @dataclass
@@ -47,7 +47,7 @@ class CampaignResult:
         return all(r.passed for results in self.scenario_results.values() for r in results)
 
     def summary(self) -> str:
-        lines = [f"Campaign: {self.name} — {'PASS' if self.passed else 'FAIL'}"]
+        lines = [f"Campaign: {self.name} - {'PASS' if self.passed else 'FAIL'}"]
         for scen, results in self.scenario_results.items():
             for r in results:
                 mark = "PASS" if r.passed else "FAIL"
@@ -56,15 +56,15 @@ class CampaignResult:
         return "\n".join(lines)
 
     def to_markdown(self, path: str) -> None:
-        rows = ["# HiLo Test Report", "",
+        rows = ["# XiLoop Test Report", "",
                 f"**Campaign:** {self.name}  ",
-                f"**Verdict:** {'✅ PASS' if self.passed else '❌ FAIL'}", "",
+                f"**Verdict:** {'PASS' if self.passed else 'FAIL'}", "",
                 "| Scenario | Requirement | Description | Metric | Measured | Bound | Result |",
                 "|---|---|---|---|---|---|---|"]
         for scen, results in self.scenario_results.items():
             for r in results:
                 rows.append(f"| {scen} | {r.req_id} | {r.description} | {r.metric} | "
-                            f"{r.measured:.4g} | {r.bound} | {'✅' if r.passed else '❌'} |")
+                            f"{r.measured:.4g} | {r.bound} | {'PASS' if r.passed else 'FAIL'} |")
         with open(path, "w", encoding="utf-8") as f:
             f.write("\n".join(rows) + "\n")
 
