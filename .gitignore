@@ -1,0 +1,20 @@
+# documentation stays local
+docs/
+
+# generated example artifacts
+examples/**/report.md
+examples/**/telemetry.csv
+examples/**/*.png
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# editors / os
+.vscode/
+.idea/
+Thumbs.db

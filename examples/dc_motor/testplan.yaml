@@ -1,0 +1,23 @@
+name: DC motor speed controller verification
+scenarios:
+  - name: step_50
+    setpoint: 50.0       # rad/s
+    duration: 5.0
+    dt: 0.001
+  - name: step_100
+    setpoint: 100.0      # rad/s
+    duration: 5.0
+    dt: 0.001
+requirements:
+  - id: REQ-M1
+    description: settles within 2 rad/s of target
+    metric: steady_state_error
+    max: 2.0
+  - id: REQ-M2
+    description: overshoot below 15 %
+    metric: overshoot_pct
+    max: 15.0
+  - id: REQ-M3
+    description: reaches speed in under 1.5 s
+    metric: rise_time_s
+    max: 1.5
