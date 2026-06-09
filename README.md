@@ -34,6 +34,14 @@ result = CampaignRunner(device, plant).run("examples/actuator_pid/testplan.yaml"
 print(result.summary())                             # ... PASS/FAIL per requirement
 ```
 
+### Interactive tuning (v0.2)
+```bash
+pip install -e .[plot]
+python -m examples.actuator_pid.tune   # sliders for kp/ki/kd + setpoint, live metrics
+```
+Drag a slider — the loop re-runs instantly and rise time / overshoot / steady-state error /
+settling time update live. When the response looks right, lock the gains in with a campaign.
+
 ## Why
 In-the-loop testing (SiL/PiL/HiL) is how industry verifies control software before touching
 real hardware — but the established tools (dSPACE, NI, ECU-TEST) cost five to six figures.
@@ -58,8 +66,8 @@ One line: **pytest for control loops.**
 ## Roadmap
 | Version | Adds | Status |
 |---|---|---|
-| v0.1 | Core engine, Device/Plant interfaces, telemetry, campaign runner, actuator example | ✅ this release |
-| v0.2 | Live dashboard (plots, setpoint, tuning) | planned |
+| v0.1 | Core engine, Device/Plant interfaces, telemetry, campaign runner, actuator example | ✅ |
+| v0.2 | Interactive tuning dashboard (sliders, live metrics) + settling-time metric | ✅ this release |
 | v0.3 | SocketDevice → C/C++ firmware in Renode/QEMU (PiL) | planned |
 | v0.4 | SerialDevice → real microcontroller (true HiL), PyPI release | planned |
 

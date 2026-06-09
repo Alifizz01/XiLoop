@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xiloop"
-version = "0.1.0"
+version = "0.2.0"
 description = "XiLoop - X-in-the-Loop orchestration: wire any controller to any plant model, run the loop, verify requirements."
 readme = "README.md"
 requires-python = ">=3.10"

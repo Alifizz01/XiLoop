@@ -21,3 +21,7 @@ requirements:
     description: rise time (10-90 %) under 0.5 s
     metric: rise_time_s
     max: 0.5
+  - id: REQ-4
+    description: settles into the 2 % band within 1.5 s
+    metric: settling_time_s
+    max: 1.5

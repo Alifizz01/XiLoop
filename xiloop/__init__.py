@@ -11,7 +11,7 @@ from xiloop.plants import ActuatorPlant
 from xiloop.metrics import step_metrics
 from xiloop.campaign import CampaignRunner
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "Device", "Plant", "LoopEngine", "LoopResult",
     "PID", "PIDDevice", "ActuatorPlant",
