@@ -40,6 +40,21 @@ real hardware — but the established tools (dSPACE, NI, ECU-TEST) cost five to 
 Students, makers and small teams rebuild the same plumbing every project. HiLo is that
 plumbing, done once, open-source.
 
+## How it compares
+
+The pieces of this workflow exist — the combination doesn't:
+
+| Existing tool | Great at | What this framework adds / does differently |
+|---|---|---|
+| [OpenHTF](https://github.com/google/openhtf) (Google) | Hardware test campaigns, measurements, pass/fail | OpenHTF orchestrates *bench tests on physical devices* — no closed control loop, no plant model. We close the loop against a simulated plant. |
+| [python-control](https://python-control.readthedocs.io), [bdsim](https://github.com/petercorke/bdsim) | Control-systems analysis & block-diagram simulation | Analysis libraries — no requirements-as-YAML, no pass/fail reports, no device-under-test abstraction toward firmware/hardware. |
+| PX4 / ArduPilot SITL | Superb simulation-in-the-loop | Locked to their own flight stacks. This framework is domain-neutral: any plant, any controller. |
+| [Renode](https://renode.io) / QEMU | Firmware emulation | They emulate the *chip*; no plant, no campaigns. We orchestrate around them (roadmap v0.3). |
+| dSPACE / NI / Speedgoat / ECU-TEST | Certified, industrial HiL | Five-to-six-figure commercial rigs. This is the free, software-first on-ramp — not a certification replacement. |
+| Hand-rolled scripts | Quick start | Rewritten badly every project. This is that plumbing, done once. |
+
+One line: **pytest for control loops.**
+
 ## Roadmap
 | Version | Adds | Status |
 |---|---|---|
