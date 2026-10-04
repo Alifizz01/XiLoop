@@ -19,6 +19,36 @@
 
 ---
 
+## The problem
+
+Every product with a control loop (a motor drive, a servo fin, a battery charger, a heater, a
+drone) needs its controller verified before it touches real hardware. Today, outside big
+companies, that verification usually looks like this:
+
+| # | Problem | What it costs you | How XiLoop solves it |
+|---|---|---|---|
+| 1 | **Control bugs are found on the bench, last.** The first real test of a gain change is the real motor. | A wrong sign or an aggressive gain slams an actuator into its end stop, burns a driver stage or trips a battery. Bench time is slow and the failures are expensive or dangerous. | The controller runs against a **simulated plant** first, thousands of times in seconds. You break the model, not the hardware. |
+| 2 | **Every stage has its own test harness.** The Python/MATLAB prototype, the C firmware and the board are each tested with different, hand-written scripts. | You can't prove that the firmware behaves like the prototype that was approved. "It worked in simulation" is a feeling, not evidence. | One **test plan** runs unchanged against Python (SiL), compiled C firmware (PiL) and a real board (HiL). Only the `device:` line changes. The demo C firmware matches the Python PID to four significant figures. |
+| 3 | **Requirements live in a document, not in code.** "Overshoot < 30 %" sits in a PDF or spreadsheet and is checked by eye on a scope. | No regression testing. Next month a small gain tweak silently breaks settling time and nobody notices until integration. | Requirements are **executable checks** with a PASS/FAIL verdict, a Markdown report and an exit code. `xiloop run` in CI turns a broken requirement into a red build. |
+| 4 | **Real HiL tooling is out of reach.** dSPACE, NI, Speedgoat and ECU-TEST rigs cost five to six figures. | Students, makers, start-ups and university labs have nothing between `print()` debugging and an industrial rig, so they rebuild the same plumbing every project. | Free and open source, runs on a laptop, and grows from pure software to a USB-serial board without changing tools. |
+| 5 | **Tuning is a slow edit-flash-measure loop.** Change a gain, recompile, flash, run, eyeball the scope, repeat. | Hours per controller, and the "good" gains are whatever looked fine on the last try. | Drag a slider and the loop re-runs in about 25 ms with six live metrics. Firmware gains are sent over the wire (`P kp 2.0`), so even C firmware tunes without reflashing. |
+| 6 | **Only programmers can run the tests.** Test engineers, students and reviewers have to read and edit Python to check a controller. | Verification bottlenecks on the one person who wrote the scripts. | **XiLoop Studio** does everything from a GUI: plants typed as G(s), requirements in a table, one-click campaigns. The **REST API** lets Excel, MATLAB, LabVIEW or a CI job do the same. |
+
+**In one sentence:** XiLoop lets you prove, cheaply and repeatably, that a controller meets
+its requirements, from the first Python sketch through the C firmware to the real board,
+before anything expensive can break.
+
+**Who it is for:** embedded and control engineers, students in control/mechatronics/EE labs,
+makers building motor or power projects, and small teams that need HiL-style evidence without a
+HiL budget.
+
+**What it is not** (honest limits):
+- not a certified tool (no ISO 26262 / DO-178C qualification). It produces evidence, not certification
+- not hard real-time: real-time mode follows the PC's wall clock (millisecond-level jitter). Lock-step mode keeps the physics exact regardless
+- single-input single-output loops today. MIMO is on the roadmap
+
+---
+
 ## What it does
 
 XiLoop wires the **device under test** (your controller) to a **plant model** (the simulated
@@ -296,7 +326,7 @@ assets/make_screenshots.py                  regenerates every image in this READ
 ```
 
 ```bash
-pytest -q          # 25 tests: engine, metrics, transfer functions, socket firmware, CLI, REST API
+pytest -q          # 26 tests: engine, metrics, transfer functions, socket firmware, CLI, REST API
 ```
 
 ## License

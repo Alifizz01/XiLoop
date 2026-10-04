@@ -10,6 +10,8 @@ test plans, the CLI and the Studio GUI.
 """
 import dataclasses
 import importlib
+import os
+import sys
 
 from xiloop.controllers import PID, PIDDevice
 from xiloop.interfaces import Device, Plant
@@ -30,6 +32,8 @@ def load_class(path: str, base: type):
     mod, sep, name = path.partition(":")
     if not sep:
         raise ValueError(f"expected 'module:Class', got {path!r}")
+    if os.getcwd() not in sys.path:      # let `mymodule:MyPlant` resolve from the project
+        sys.path.insert(0, os.getcwd())  # folder, also under the installed `xiloop` command
     cls = getattr(importlib.import_module(mod), name, None)
     if not (isinstance(cls, type) and issubclass(cls, base)):
         raise ValueError(f"{path!r} is not a {base.__name__} class")

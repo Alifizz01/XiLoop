@@ -132,3 +132,14 @@ def test_api_rejects_cross_site_requests(api):
 def test_api_errors_are_readable(api):
     code, r = api("/api/simulate", {"plant": {"type": "nope"}})
     assert code == 400 and "unknown plant" in r["error"]
+
+
+def test_custom_plant_resolves_from_working_folder(tmp_path, monkeypatch):
+    # the installed `xiloop` / `xiloop-studio` commands don't put cwd on sys.path
+    (tmp_path / "myheater.py").write_text(
+        "from dataclasses import dataclass\nfrom xiloop import Plant\n"
+        "@dataclass\nclass Heater(Plant):\n    k: float = 2.0\n"
+        "    def step(self, u, dt): return u / self.k\n")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.path", [p for p in __import__("sys").path if p not in ("", str(tmp_path))])
+    assert build_plant({"type": "myheater:Heater", "params": {"k": 4}}).step(8, 0.1) == 2
