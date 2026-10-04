@@ -1,4 +1,9 @@
 name: DC motor speed controller verification
+plant:
+  type: "examples.dc_motor.plant:DCMotorPlant"
+device:
+  type: pid
+  params: {kp: 1.5, ki: 3.0, kd: 0.0, out_max: 24.0}
 scenarios:
   - name: step_50
     setpoint: 50.0       # rad/s

@@ -12,6 +12,7 @@ from xiloop import Plant
 
 @dataclass
 class DCMotorPlant(Plant):
+    STATE = ("w",)
     R: float = 1.0      # winding resistance [ohm]
     Ke: float = 0.10    # back-EMF constant [V*s/rad]
     Kt: float = 0.10    # torque constant [N*m/A]

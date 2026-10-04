@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xiloop"
-version = "0.2.0"
+version = "1.0.0"
 description = "XiLoop - X-in-the-Loop orchestration: wire any controller to any plant model, run the loop, verify requirements."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,7 +14,19 @@ dependencies = ["pyyaml"]
 
 [project.optional-dependencies]
 plot = ["matplotlib"]
-dev = ["pytest", "matplotlib"]
+studio = ["pywebview>=5"]
+hil = ["pyserial"]
+all = ["matplotlib", "pywebview>=5", "pyserial"]
+dev = ["pytest", "matplotlib", "pyserial"]
+
+[project.scripts]
+xiloop = "xiloop.cli:main"
+
+[project.gui-scripts]
+xiloop-studio = "xiloop.studio_app:main"
 
 [tool.setuptools.packages.find]
 include = ["xiloop*"]
+
+[tool.setuptools.package-data]
+xiloop = ["studio/*"]

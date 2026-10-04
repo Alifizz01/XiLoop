@@ -7,13 +7,15 @@ records telemetry, and verifies requirement-based test campaigns.
 from xiloop.interfaces import Device, Plant
 from xiloop.engine import LoopEngine, LoopResult
 from xiloop.controllers import PID, PIDDevice
-from xiloop.plants import ActuatorPlant
+from xiloop.plants import ActuatorPlant, FirstOrderPlant, TransferFunctionPlant
 from xiloop.metrics import step_metrics
-from xiloop.campaign import CampaignRunner
+from xiloop.campaign import CampaignRunner, CampaignResult
+from xiloop.devices import SocketDevice, SerialDevice, DeviceError
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"
 __all__ = [
     "Device", "Plant", "LoopEngine", "LoopResult",
-    "PID", "PIDDevice", "ActuatorPlant",
-    "step_metrics", "CampaignRunner",
+    "PID", "PIDDevice", "SocketDevice", "SerialDevice", "DeviceError",
+    "ActuatorPlant", "FirstOrderPlant", "TransferFunctionPlant",
+    "step_metrics", "CampaignRunner", "CampaignResult",
 ]

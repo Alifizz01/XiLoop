@@ -1,12 +1,14 @@
 """CampaignRunner - the heart of XiLoop.
 
-Reads a YAML test plan (scenarios + requirements), runs every scenario through
+Reads a test plan (scenarios + requirements), runs every scenario through
 the LoopEngine, checks every requirement against the measured metrics, and
 writes a pass/fail report. Think: pytest for control loops.
 
-Test plan format (YAML):
+Test plan format (YAML, or the same structure as a dict):
 
     name: Actuator PID verification
+    plant:  {type: actuator}                     # optional - see xiloop.build
+    device: {type: pid, params: {kp: 2.0}}       # optional - see xiloop.build
     scenarios:
       - name: step_1rad
         setpoint: 1.0
@@ -17,6 +19,7 @@ Test plan format (YAML):
         description: steady-state error below 2 %
         metric: steady_state_error
         max: 0.02
+        scenarios: [step_1rad]                   # optional - default: all
 """
 from dataclasses import dataclass, field
 
@@ -24,7 +27,7 @@ import yaml
 
 from xiloop.engine import LoopEngine
 from xiloop.interfaces import Device, Plant
-from xiloop.metrics import step_metrics
+from xiloop.metrics import METRICS, step_metrics
 
 
 @dataclass
@@ -41,6 +44,8 @@ class RequirementResult:
 class CampaignResult:
     name: str
     scenario_results: dict = field(default_factory=dict)   # scenario -> [RequirementResult]
+    runs: dict = field(default_factory=dict)               # scenario -> LoopResult
+    metrics: dict = field(default_factory=dict)            # scenario -> metrics dict
 
     @property
     def passed(self) -> bool:
@@ -55,7 +60,7 @@ class CampaignResult:
                              f"{r.measured:.4g} (required {r.bound})")
         return "\n".join(lines)
 
-    def to_markdown(self, path: str) -> None:
+    def markdown(self) -> str:
         rows = ["# XiLoop Test Report", "",
                 f"**Campaign:** {self.name}  ",
                 f"**Verdict:** {'PASS' if self.passed else 'FAIL'}", "",
@@ -65,40 +70,73 @@ class CampaignResult:
             for r in results:
                 rows.append(f"| {scen} | {r.req_id} | {r.description} | {r.metric} | "
                             f"{r.measured:.4g} | {r.bound} | {'PASS' if r.passed else 'FAIL'} |")
+        return "\n".join(rows) + "\n"
+
+    def to_markdown(self, path: str) -> None:
         with open(path, "w", encoding="utf-8") as f:
-            f.write("\n".join(rows) + "\n")
+            f.write(self.markdown())
+
+
+def load_plan(plan) -> dict:
+    """A path to a YAML file, YAML text, or an already-parsed dict -> dict."""
+    if isinstance(plan, dict):
+        return plan
+    if "\n" not in plan and plan.endswith((".yaml", ".yml")):
+        with open(plan, encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    return yaml.safe_load(plan) or {}
+
+
+def check(req: dict, measured: float) -> tuple[bool, str]:
+    passed, bounds = True, []
+    if "max" in req:
+        passed &= measured <= float(req["max"])
+        bounds.append(f"<= {req['max']}")
+    if "min" in req:
+        passed &= measured >= float(req["min"])
+        bounds.append(f">= {req['min']}")
+    return passed, " and ".join(bounds)
 
 
 class CampaignRunner:
     def __init__(self, device: Device, plant: Plant):
         self.engine = LoopEngine(device, plant)
 
-    def run(self, testplan_path: str) -> CampaignResult:
-        with open(testplan_path, encoding="utf-8") as f:
-            plan = yaml.safe_load(f)
+    @classmethod
+    def from_plan(cls, plan) -> "CampaignRunner":
+        """Build device and plant from the plan's own `device:`/`plant:` sections."""
+        from xiloop.build import build_device, build_plant
+        plan = load_plan(plan)
+        if "plant" not in plan:
+            raise ValueError("test plan has no 'plant:' section")
+        return cls(build_device(plan.get("device", {"type": "pid"})), build_plant(plan["plant"]))
 
+    def run(self, plan, on_tick=None) -> CampaignResult:
+        plan = load_plan(plan)
         result = CampaignResult(name=plan.get("name", "unnamed campaign"))
-        requirements = plan.get("requirements", [])
+        requirements = plan.get("requirements") or []
+        for req in requirements:
+            if req.get("metric") not in METRICS:
+                raise ValueError(f"requirement {req.get('id', '?')}: unknown metric "
+                                 f"{req.get('metric')!r} - choose from {list(METRICS)}")
 
-        for scen in plan.get("scenarios", []):
-            run = self.engine.run(setpoint=scen["setpoint"],
-                                  duration=scen["duration"],
-                                  dt=scen.get("dt", 0.001))
+        for scen in plan.get("scenarios") or []:
+            name = scen["name"]
+            run = self.engine.run(setpoint=float(scen["setpoint"]),
+                                  duration=float(scen["duration"]),
+                                  dt=float(scen.get("dt", 0.001)),
+                                  on_tick=on_tick)
             metrics = step_metrics(run)
             checks = []
             for req in requirements:
+                if "scenarios" in req and name not in req["scenarios"]:
+                    continue
                 measured = metrics[req["metric"]]
-                passed, bound = True, ""
-                if "max" in req:
-                    passed &= measured <= req["max"]
-                    bound = f"<= {req['max']}"
-                if "min" in req:
-                    passed &= measured >= req["min"]
-                    bound = (bound + " and " if bound else "") + f">= {req['min']}"
+                passed, bound = check(req, measured)
                 checks.append(RequirementResult(
-                    req_id=req.get("id", "REQ-?"),
-                    description=req.get("description", ""),
-                    metric=req["metric"], bound=bound,
-                    measured=measured, passed=passed))
-            result.scenario_results[scen["name"]] = checks
+                    req_id=req.get("id", "REQ-?"), description=req.get("description", ""),
+                    metric=req["metric"], bound=bound, measured=measured, passed=passed))
+            result.scenario_results[name] = checks
+            result.runs[name] = run
+            result.metrics[name] = metrics
         return result

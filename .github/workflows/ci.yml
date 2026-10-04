@@ -10,4 +10,12 @@ jobs:
           python-version: "3.11"
       - run: pip install -e .[dev]
       - run: pytest -q
-      - run: python -m examples.actuator_pid.run
+      # the test plans themselves are CI gates: exit code 1 on FAIL
+      - run: xiloop run examples/actuator_pid/testplan.yaml --report report.md
+      - run: xiloop run examples/dc_motor/testplan.yaml
+      - name: PiL - C firmware in the loop
+        run: |
+          cc -O2 examples/firmware_pid/host_main.c examples/firmware_pid/pid_core.c -o pid_firmware
+          ./pid_firmware 5555 &
+          sleep 1
+          xiloop run examples/firmware_pid/testplan.yaml

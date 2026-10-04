@@ -18,3 +18,7 @@ dist/
 .vscode/
 .idea/
 Thumbs.db
+
+# compiled firmware
+*.exe
+*.obj

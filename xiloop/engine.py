@@ -5,6 +5,7 @@ Runs the device<->plant exchange at a fixed step. Two timing modes:
   * realtime: each tick is synchronized to the wall clock - feels like a bench.
 """
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from xiloop.interfaces import Device, Plant
@@ -35,7 +36,10 @@ class LoopEngine:
         self.plant = plant
 
     def run(self, setpoint: float, duration: float, dt: float = 0.001,
-            realtime: bool = False) -> LoopResult:
+            realtime: bool = False,
+            on_tick: Callable[[LoopResult], bool | None] | None = None) -> LoopResult:
+        """Run one scenario. `on_tick(result_so_far)` is called after every tick
+        (live plotting, progress); returning True aborts the run early."""
         self.device.reset()
         self.plant.reset()
         self.device.set_setpoint(setpoint)
@@ -50,8 +54,12 @@ class LoopEngine:
             res.t.append(i * dt)
             res.measurement.append(meas)
             res.command.append(cmd)
+            if on_tick is not None and on_tick(res):
+                break
             if realtime:
                 target = t0 + (i + 1) * dt
-                while time.perf_counter() < target:
+                if target - time.perf_counter() > 0.002:     # sleep the bulk,
+                    time.sleep(target - time.perf_counter() - 0.001)
+                while time.perf_counter() < target:          # spin the last ms
                     pass
         return res

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XiLoop Studio</title>
+<link rel="stylesheet" href="uPlot.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="mark"><span class="mark-x">Xi</span>Loop <span class="mark-sub">Studio</span></div>
+  <nav class="modes" role="tablist" aria-label="Mode">
+    <button role="tab" class="mode" data-mode="tune" aria-selected="true">Tune</button>
+    <button role="tab" class="mode" data-mode="verify" aria-selected="false">Verify</button>
+  </nav>
+  <div class="bar-right">
+    <button class="ghost" id="api-open" title="Show this run as an API call">{ } API call</button>
+    <span class="chip" id="conn"><i></i><span>connecting…</span></span>
+  </div>
+</header>
+
+<main class="desk">
+  <!-- ============ left rail: the loop wiring ============ -->
+  <aside class="rail">
+    <section class="block">
+      <h2>Device <small>under test</small></h2>
+      <div class="seg" id="dev-type" role="radiogroup" aria-label="Device type">
+        <button data-v="pid" aria-pressed="true">Python PID</button>
+        <button data-v="socket" aria-pressed="false">Firmware · TCP</button>
+        <button data-v="serial" aria-pressed="false">Board · serial</button>
+        <button data-v="custom" aria-pressed="false">Custom</button>
+      </div>
+
+      <div class="dev-pane" data-for="socket" hidden>
+        <div class="row2">
+          <label>Host<input id="sock-host" value="127.0.0.1" spellcheck="false"></label>
+          <label>Port<input id="sock-port" type="number" value="5555"></label>
+        </div>
+        <div class="board">
+          <button class="ghost small" id="board-toggle">Start virtual board</button>
+          <span class="hint" id="board-state">No firmware? Start a virtual one on this port.</span>
+        </div>
+      </div>
+      <div class="dev-pane" data-for="serial" hidden>
+        <div class="row2">
+          <label>Port<select id="ser-port"></select></label>
+          <label>Baud<select id="ser-baud"><option>9600</option><option>57600</option><option selected>115200</option><option>230400</option><option>921600</option></select></label>
+        </div>
+        <button class="ghost small" id="ser-refresh">Refresh ports</button>
+      </div>
+      <div class="dev-pane" data-for="custom" hidden>
+        <label>Device class<input id="cust-class" placeholder="mypkg.ctrl:MyDevice" spellcheck="false"></label>
+        <p class="hint">Any Python class that subclasses <code>xiloop.Device</code>. The gains below are passed to it as keyword arguments.</p>
+      </div>
+
+      <div id="gains"></div>
+      <p class="hint" id="gains-hint" hidden>Sent to the firmware as <code>P kp 2.0</code> lines before every run.</p>
+    </section>
+
+    <section class="block">
+      <h2>Plant <small>simulated system</small></h2>
+      <label class="sr" for="plant-type">Plant model</label>
+      <select id="plant-type"></select>
+      <p class="hint" id="plant-doc"></p>
+      <div id="tf-preview" class="tf" hidden></div>
+      <div id="plant-params" class="params"></div>
+      <label id="plant-custom-wrap" hidden>Plant class<input id="plant-custom" placeholder="mypkg.models:MyPlant" spellcheck="false"></label>
+    </section>
+
+    <section class="block" data-show="tune">
+      <h2>Scenario <small>step test</small></h2>
+      <div class="row3">
+        <label>Setpoint<input id="sc-sp" inputmode="decimal" value="1"></label>
+        <label>Duration s<input id="sc-dur" inputmode="decimal" value="3"></label>
+        <label>dt s<input id="sc-dt" inputmode="decimal" value="0.001"></label>
+      </div>
+      <label class="check stack"><input type="checkbox" id="sc-rt"> Real time <span class="hint">Ticks follow the wall clock, like a bench.</span></label>
+      <label class="check"><input type="checkbox" id="sc-live" checked> Re-run when I change something</label>
+    </section>
+  </aside>
+
+  <!-- ============ TUNE ============ -->
+  <section class="view" id="view-tune">
+    <div class="recorder">
+      <div class="recorder-head">
+        <div class="legend" id="legend">
+          <button data-s="1" aria-pressed="true"><i class="pen meas"></i>Measurement</button>
+          <button data-s="2" aria-pressed="true"><i class="pen sp"></i>Setpoint</button>
+          <button data-s="3" aria-pressed="true"><i class="pen cmd"></i>Command</button>
+          <button data-s="band" aria-pressed="true"><i class="pen band"></i>±2 % band</button>
+        </div>
+        <div class="run-ctl">
+          <span class="status" id="status">Ready</span>
+          <button class="primary" id="run">Run</button>
+        </div>
+      </div>
+      <div class="paper" id="chart"></div>
+    </div>
+    <div class="meters" id="meters"></div>
+  </section>
+
+  <!-- ============ VERIFY ============ -->
+  <section class="view" id="view-verify" hidden>
+    <div class="plan">
+      <div class="plan-head">
+        <input id="plan-name" class="plan-name" value="My verification campaign" aria-label="Campaign name" spellcheck="false">
+        <div class="plan-tools">
+          <select id="ex-pick" aria-label="Open an example plan"><option value="">Open example…</option></select>
+          <button class="ghost small" id="yaml-import">Import YAML</button>
+          <button class="ghost small" id="yaml-export">Export YAML</button>
+          <input type="file" id="yaml-file" accept=".yaml,.yml" hidden>
+        </div>
+      </div>
+
+      <h3>Scenarios <button class="add" id="add-scen" aria-label="Add scenario">+ Add</button></h3>
+      <table class="grid" id="scen-table">
+        <thead><tr><th>Name</th><th>Setpoint</th><th>Duration s</th><th>dt s</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <h3>Requirements <button class="add" id="add-req" aria-label="Add requirement">+ Add</button></h3>
+      <table class="grid" id="req-table">
+        <thead><tr><th>ID</th><th>What it means</th><th>Metric</th><th>Min</th><th>Max</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="plan-run">
+        <span class="status" id="v-status">Device and plant come from the left panel.</span>
+        <button class="primary" id="v-run">Run campaign</button>
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="verdict" id="verdict">
+        <div class="stamp idle" id="stamp">NOT RUN</div>
+        <div class="verdict-txt">
+          <strong id="v-title">Run the campaign to get a verdict</strong>
+          <span id="v-sub" class="hint">Every scenario is checked against every requirement.</span>
+        </div>
+        <div class="verdict-tools">
+          <button class="ghost small" id="rep-md" disabled>Save report</button>
+          <button class="ghost small" id="rep-csv" disabled>Save telemetry</button>
+        </div>
+      </div>
+      <div class="paper small" id="v-chart"></div>
+      <table class="grid res" id="res-table">
+        <thead><tr><th>Scenario</th><th>Req.</th><th>Metric</th><th>Measured</th><th>Bound</th><th>Result</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<dialog id="api-dlg" aria-labelledby="api-title">
+  <form method="dialog">
+    <h2 id="api-title">This run as an API call</h2>
+    <p class="hint">Studio is a client of the local XiLoop API. Anything you do here, a script, Excel or LabVIEW can do too, while Studio is open or with <code>xiloop serve</code>.</p>
+    <div class="seg" id="api-lang">
+      <button type="button" data-v="curl" aria-pressed="true">curl</button>
+      <button type="button" data-v="python" aria-pressed="false">Python</button>
+      <button type="button" data-v="json" aria-pressed="false">JSON body</button>
+    </div>
+    <pre id="api-code"></pre>
+    <div class="dlg-foot">
+      <button type="button" class="ghost" id="api-copy">Copy</button>
+      <button class="primary">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="uPlot.iife.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

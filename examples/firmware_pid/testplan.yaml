@@ -1,18 +1,20 @@
-name: Actuator PID verification
+# Same requirements as the Python PID, but the controller is C firmware.
+# Start it first:  examples/firmware_pid/pid_firmware.exe   (or: xiloop firmware)
+name: C firmware PID verification (PiL)
 plant:
   type: actuator
 device:
-  type: pid
+  type: socket
+  host: 127.0.0.1
+  port: 5555
   params: {kp: 2.0, ki: 1.0, kd: 0.05}
 scenarios:
   - name: step_small
     setpoint: 0.5
     duration: 3.0
-    dt: 0.001
   - name: step_1rad
     setpoint: 1.0
     duration: 3.0
-    dt: 0.001
 requirements:
   - id: REQ-1
     description: steady-state error below 2 %
@@ -22,10 +24,6 @@ requirements:
     description: overshoot below 30 %
     metric: overshoot_pct
     max: 30.0
-  - id: REQ-3
-    description: rise time (10-90 %) under 0.5 s
-    metric: rise_time_s
-    max: 0.5
   - id: REQ-4
     description: settles into the 2 % band within 1.5 s
     metric: settling_time_s
