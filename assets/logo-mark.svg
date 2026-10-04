@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>XiLoop</title>
+  <rect width="64" height="64" rx="14" fill="#1B2430"/>
+  <!-- setpoint: the red pen -->
+  <line x1="11" y1="25" x2="53" y2="25" stroke="#E0574D" stroke-width="1.6" stroke-dasharray="3 2.4"/>
+  <!-- feedback path: measurement returns to the controller -->
+  <path d="M51 25 C 58 34, 52 49, 36 50 L 20 50" fill="none" stroke="#C9CEC6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M21.5 45.2 L 14.5 50 L 21.5 54.8 Z" fill="#C9CEC6"/>
+  <!-- the step response: rises, overshoots, settles onto the setpoint -->
+  <path d="M12 45 C 17 45, 18 16, 25 16 C 31 16, 31 28, 36 27 C 41 26, 43 25, 51 25" fill="none" stroke="#7F8FF2" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,6 +1,9 @@
 <div align="center">
 
-# XiLoop
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
+  <img src="assets/logo.png" alt="XiLoop" width="360">
+</picture>
 
 **X-in-the-Loop test bench: from a Python prototype to C firmware to a real board, with one test plan.**
 

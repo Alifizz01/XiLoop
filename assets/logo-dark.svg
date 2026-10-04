@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" width="300" height="80">
+  <title>XiLoop</title>
+  <g transform="translate(8 8)">
+    <rect width="64" height="64" rx="14" fill="#1B2430"/>
+    <line x1="11" y1="25" x2="53" y2="25" stroke="#E0574D" stroke-width="1.6" stroke-dasharray="3 2.4"/>
+    <path d="M51 25 C 58 34, 52 49, 36 50 L 20 50" fill="none" stroke="#C9CEC6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M21.5 45.2 L 14.5 50 L 21.5 54.8 Z" fill="#C9CEC6"/>
+    <path d="M12 45 C 17 45, 18 16, 25 16 C 31 16, 31 28, 36 27 C 41 26, 43 25, 51 25" fill="none" stroke="#7F8FF2" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="88" y="49" font-family="Bahnschrift, 'DIN Alternate', 'Barlow Semi Condensed', 'Arial Narrow', sans-serif" font-size="40" font-weight="600" fill="#F2F4F7" letter-spacing="0.5"><tspan fill="#8C9BF5">Xi</tspan>Loop</text>
+  <text x="90" y="68" font-family="Bahnschrift, 'DIN Alternate', 'Arial Narrow', sans-serif" font-size="10.5" font-weight="400" fill="#9AA5B4" letter-spacing="2.6">X-IN-THE-LOOP TEST BENCH</text>
+</svg>

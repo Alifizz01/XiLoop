@@ -42,7 +42,8 @@ code { font: 12px var(--f-num); background: var(--raised); padding: 0 3px; borde
   border-bottom: 1px solid var(--rule);
   background: linear-gradient(#EDEEEA, var(--panel));
 }
-.mark { font: 600 21px/1 var(--f-label); letter-spacing: .01em; }
+.mark { font: 600 21px/1 var(--f-label); letter-spacing: .01em; display: flex; align-items: center; }
+.mark img { margin-right: 9px; }
 .mark-x { color: var(--pen-meas); }
 .mark-sub { font-weight: 300; color: var(--muted); margin-left: 2px; }
 .modes { display: flex; gap: 2px; background: #D6D9D3; padding: 3px; border-radius: 6px; }
