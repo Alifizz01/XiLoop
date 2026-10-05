@@ -40,7 +40,7 @@ from xiloop.campaign import CampaignRunner, load_plan
 from xiloop.engine import LoopEngine
 from xiloop.metrics import METRICS, step_metrics
 
-STATIC = os.path.join(os.path.dirname(__file__), "studio")
+STATIC = os.path.abspath(os.path.join(os.path.dirname(__file__), "studio"))   # normalised: the traversal check compares against it
 EXAMPLES = os.path.join(os.path.dirname(os.path.dirname(__file__)), "examples")
 MAX_POINTS = 4000
 TYPES = {".html": "text/html", ".js": "text/javascript", ".css": "text/css",
@@ -268,7 +268,7 @@ class Handler(BaseHTTPRequestHandler):
     def _static(self, path):
         rel = "index.html" if path == "/" else path.lstrip("/")
         full = os.path.normpath(os.path.join(STATIC, rel))
-        if not full.startswith(STATIC) or not os.path.isfile(full):
+        if not full.startswith(STATIC + os.sep) or not os.path.isfile(full):
             return self._send(404, {"error": "not found"})
         with open(full, "rb") as f:
             self._send(200, body=f.read(), ctype=TYPES.get(os.path.splitext(full)[1], "application/octet-stream"))
